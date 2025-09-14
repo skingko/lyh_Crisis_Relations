@@ -49,19 +49,35 @@ export default function AIChat() {
     setIsLoading(true)
 
     try {
-      // 直接调用 Kimi API
-      const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+      // 尝试使用 Functions API 端点
+      let response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ***REMOVED***'
         },
         body: JSON.stringify({
-          model: 'kimi-k2-0905-preview',
-          messages: [
-            {
-              role: 'system',
-              content: `你是一位专业的舆论危机管理专家，专门分析和处理企业公关危机。当前正在分析罗永浩与西贝预制菜争议事件。
+          messages: [...messages, userMessage].map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
+        })
+      })
+
+      // 如果 Functions API 不可用，尝试直接调用 Kimi API（可能会有 CORS 问题）
+      if (!response.ok && response.status === 404) {
+        console.log('Functions API 不可用，尝试直接调用 Kimi API...')
+        response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ***REMOVED***'
+          },
+          body: JSON.stringify({
+            model: 'kimi-k2-0905-preview',
+            messages: [
+              {
+                role: 'system',
+                content: `你是一位专业的舆论危机管理专家，专门分析和处理企业公关危机。当前正在分析罗永浩与西贝预制菜争议事件。
 
 **事件背景**：
 - 罗永浩质疑西贝使用预制菜并批评其价格
@@ -77,26 +93,40 @@ export default function AIChat() {
 5. 利益相关方管理
 
 请基于专业知识，为用户提供具体、可操作的建议。回答要专业、客观、有建设性。`
-            },
-            ...[...messages, userMessage].map(msg => ({
-              role: msg.role,
-              content: msg.content
-            }))
-          ],
-          temperature: 0.7,
-          max_tokens: 2000
+              },
+              ...[...messages, userMessage].map(msg => ({
+                role: msg.role,
+                content: msg.content
+              }))
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+          })
         })
-      })
+      }
 
       if (!response.ok) {
-        throw new Error(`API请求失败: ${response.status}`)
+        throw new Error(`API请求失败: ${response.status} - ${response.statusText}`)
       }
 
       const data = await response.json()
 
+      let content = ''
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        // Kimi API 响应格式
+        content = data.choices[0].message.content
+      } else if (data.content) {
+        // Functions API 响应格式
+        content = data.content
+      } else if (data.message) {
+        content = data.message
+      } else {
+        content = '抱歉，我暂时无法回答您的问题。'
+      }
+
       const assistantMessage: ChatMessage = {
         role: 'assistant',
-        content: data.choices?.[0]?.message?.content || '抱歉，我暂时无法回答您的问题。',
+        content: content,
         timestamp: new Date()
       }
 
@@ -105,7 +135,7 @@ export default function AIChat() {
       console.error('发送消息失败:', error)
       const errorMessage: ChatMessage = {
         role: 'assistant',
-        content: '抱歉，AI服务暂时不可用。请稍后再试，或者查看页面上的事件时间线了解详细信息。',
+        content: `抱歉，AI服务暂时不可用。错误信息：${error instanceof Error ? error.message : '未知错误'}。请稍后再试，或者查看页面上的事件时间线了解详细信息。`,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
