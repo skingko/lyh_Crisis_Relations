@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  // 禁用 LightningCSS 以避免原生模块问题
+  experimental: {
+    optimizeCss: false,
+  },
+
   // 环境变量配置
   env: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
