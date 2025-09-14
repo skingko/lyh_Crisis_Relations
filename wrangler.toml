@@ -7,7 +7,7 @@ pages_build_output_dir = ".vercel/output/static"
 [[d1_databases]]
 binding = "DB"
 database_name = "lyh-crisis-relations-db"
-database_id = "ed0c5c5a-9eed-46ff-b9c8-7e4b8c8e8e8e"
+database_id = "ed0c5c5a-9eed-46ff-b9ed-a4a2aa144f75"
 
 # 环境变量
 [vars]
