@@ -14,21 +14,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
+  title: "舆论危机监控中心 - 罗永浩与西贝预制菜争议事件追踪",
+  description: "专业的舆论危机监控平台，实时追踪罗永浩与西贝预制菜争议事件，提供AI驱动的危机处理建议和公关策略分析。",
+  keywords: ["舆论危机", "危机公关", "罗永浩", "西贝", "预制菜", "餐饮危机", "品牌管理", "公关策略", "AI助手"],
+  authors: [{ name: "危机处理专家团队" }],
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    title: "舆论危机监控中心 - 罗永浩与西贝预制菜争议",
+    description: "专业的舆论危机监控与AI驱动的危机处理建议平台",
+    url: "https://74a0d879.lyh-crisis-relations.pages.dev",
+    siteName: "舆论危机监控中心",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "舆论危机监控中心",
+    description: "专业的舆论危机监控与AI驱动的危机处理建议平台",
   },
 };
 

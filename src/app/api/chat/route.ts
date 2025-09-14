@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-// 静态导出配置
-export const dynamic = 'force-static'
-export const revalidate = false
+// Edge Runtime 配置 - 适配 Cloudflare Pages
+export const runtime = 'edge'
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant'

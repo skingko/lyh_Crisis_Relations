@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Cloudflare Pages 部署配置
-  output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
+  // Cloudflare Pages 部署配置 - 不使用静态导出以支持 API 路由
   trailingSlash: true,
   distDir: '.next',
   // 静态资源路径配置 - 使用相对路径以适配 Cloudflare Pages
