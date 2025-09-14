@@ -5,23 +5,22 @@ compatibility_date = "2024-09-14"
 pages_build_output_dir = ".next"
 
 [env.production]
-vars = { NODE_ENV = "production" }
+vars = {
+  NODE_ENV = "production",
+  OPENAI_API_KEY = "",
+  OPENAI_BASE_URL = "https://api.moonshot.cn/v1",
+  OPENAI_MODEL = "kimi-k2-0905-preview",
+  DATABASE_URL = ""
+}
 
 [env.preview]
-vars = { NODE_ENV = "development" }
-
-# Environment variables configuration
-[env.production.vars]
-OPENAI_API_KEY = ""
-OPENAI_BASE_URL = "https://api.moonshot.cn/v1"
-OPENAI_MODEL = "kimi-k2-0905-preview"
-DATABASE_URL = ""
-
-[env.preview.vars]
-OPENAI_API_KEY = ""
-OPENAI_BASE_URL = "https://api.moonshot.cn/v1"
-OPENAI_MODEL = "kimi-k2-0905-preview"
-DATABASE_URL = ""
+vars = {
+  NODE_ENV = "development",
+  OPENAI_API_KEY = "",
+  OPENAI_BASE_URL = "https://api.moonshot.cn/v1",
+  OPENAI_MODEL = "kimi-k2-0905-preview",
+  DATABASE_URL = ""
+}
 
 # D1 Database configuration
 [[d1_databases]]
