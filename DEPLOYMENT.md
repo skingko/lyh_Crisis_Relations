@@ -28,8 +28,11 @@
    - 选择 "Edit Cloudflare Workers" 模板
    - 设置权限：
      - Account → Workers & Pages → Edit
+     - Account → D1 → Edit
      - Zone → DNS → Read
    - 创建并保存 Token（**仅显示一次，请妥善保存**）
+
+   **重要**: 确保包含 **D1 → Edit** 权限，否则无法创建和管理数据库
 
 #### 2. 配置 GitHub 仓库密钥
 

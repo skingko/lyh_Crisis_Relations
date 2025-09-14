@@ -1,9 +1,6 @@
 name = "lyh-crisis-relations"
 compatibility_date = "2024-09-14"
 
-# Pages configuration
-pages_build_output_dir = ".next"
-
 [env.production.vars]
 NODE_ENV = "production"
 OPENAI_API_KEY = ""
@@ -23,32 +20,3 @@ DATABASE_URL = ""
 binding = "DB"
 database_name = "lyh-crisis-relations-db"
 database_id = "${D1_DATABASE_ID}"
-
-# Preview database configuration
-[[d1_databases]]
-binding = "DB_PREVIEW"
-database_name = "lyh-crisis-relations-db"
-database_id = "${D1_DATABASE_ID}"
-preview_database_id = "${D1_DATABASE_ID}"
-
-# Page configuration
-[[pages]]
-project = "lyh-crisis-relations"
-production_branch = "main"
-
-# Headers configuration
-[[headers]]
-for = "/*"
-[headers.values]
-X-Frame-Options = "DENY"
-X-Content-Type-Options = "nosniff"
-X-XSS-Protection = "1; mode=block"
-Referrer-Policy = "strict-origin-when-cross-origin"
-
-# Cache configuration
-[[headers]]
-for = "/api/*"
-[headers.values]
-Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
-Pragma = "no-cache"
-Expires = "0"
