@@ -45,6 +45,9 @@
 | `OPENAI_API_KEY` | `***REMOVED***` | Kimi API 密钥 |
 | `OPENAI_BASE_URL` | `https://api.moonshot.cn/v1` | Kimi API 基础 URL |
 | `OPENAI_MODEL` | `kimi-k2-0905-preview` | 使用的 AI 模型 |
+| `D1_DATABASE_ID` | 你的 D1 数据库 ID | 创建 D1 数据库后获得 |
+| `D1_DATABASE_NAME` | `lyh-crisis-relations-db` | D1 数据库名称 |
+| `DATABASE_URL` | `file:./dev.db` | 数据库连接 URL |
 
 #### 3. 创建 Cloudflare Pages 项目
 
@@ -60,8 +63,42 @@
      - `OPENAI_API_KEY`: 同上
      - `OPENAI_BASE_URL`: 同上
      - `OPENAI_MODEL`: 同上
+     - `DATABASE_URL`: `file:./dev.db`
+     - `D1_DATABASE_ID`: 同上
+     - `D1_DATABASE_NAME`: `lyh-crisis-relations-db`
 
-#### 4. 部署配置
+#### 4. D1 数据库配置
+
+**自动创建（推荐）**
+
+GitHub Actions 会自动创建和初始化 D1 数据库，无需手动操作。
+
+**手动创建（可选）**
+
+如果需要手动创建数据库：
+
+```bash
+# 安装 Wrangler
+npm install -g wrangler
+
+# 创建 D1 数据库
+wrangler d1 create lyh-crisis-relations-db
+
+# 初始化数据库结构
+wrangler d1 execute lyh-crisis-relations-db --file=./scripts/init-db.sql
+```
+
+**数据库绑定配置**
+
+在 Cloudflare Pages 项目设置中添加 D1 绑定：
+
+1. 进入 Pages 项目设置
+2. 找到 "Functions" 选项卡
+3. 添加 D1 数据库绑定：
+   - Variable name: `DB`
+   - D1 database: `lyh-crisis-relations-db`
+
+#### 5. 部署配置
 
 **方式一：自动部署（推荐）**
 

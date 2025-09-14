@@ -19,11 +19,26 @@ vars = { NODE_ENV = "development" }
 OPENAI_API_KEY = ""
 OPENAI_BASE_URL = "https://api.moonshot.cn/v1"
 OPENAI_MODEL = "kimi-k2-0905-preview"
+DATABASE_URL = ""
 
 [env.preview.vars]
 OPENAI_API_KEY = ""
 OPENAI_BASE_URL = "https://api.moonshot.cn/v1"
 OPENAI_MODEL = "kimi-k2-0905-preview"
+DATABASE_URL = ""
+
+# D1 Database configuration
+[[d1_databases]]
+binding = "DB"
+database_name = "lyh-crisis-relations-db"
+database_id = "${D1_DATABASE_ID}"
+
+# Preview database configuration
+[[d1_databases]]
+binding = "DB_PREVIEW"
+database_name = "lyh-crisis-relations-db"
+database_id = "${D1_DATABASE_ID}"
+preview_database_id = "${D1_DATABASE_ID}"
 
 # Page configuration
 [[pages]]

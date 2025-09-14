@@ -14,6 +14,10 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
+    "d1:init": "node scripts/init-d1.js",
+    "d1:migrate": "node scripts/migrate-d1.js",
+    "d1:execute": "wrangler d1 execute lyh-crisis-relations-db",
+    "d1:local": "wrangler d1 execute lyh-crisis-relations-db --local",
     "deploy": "npm run build:static"
   },
   "dependencies": {
