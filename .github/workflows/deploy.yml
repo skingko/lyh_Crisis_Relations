@@ -22,6 +22,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy to Cloudflare Pages
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,61 +39,51 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Build application
-        run: npm run build
+        run: npm run build:static
         env:
+          NODE_ENV: production
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
+          DATABASE_URL: "file:./dev.db"
 
       - name: Install Wrangler
-        run: npm install -g wrangler
+        run: npm install -g wrangler@latest
 
       - name: Setup D1 Database
         run: |
-          # 尝试检查数据库是否存在
-          echo "检查 D1 数据库..."
-          if wrangler d1 info lyh-crisis-relations-db 2>/dev/null; then
-            echo "✅ 数据库已存在"
+          echo "🔧 设置 D1 数据库配置..."
 
-            # 获取数据库ID
-            DB_INFO=$(wrangler d1 info lyh-crisis-relations-db)
-            DB_ID=$(echo "$DB_INFO" | grep -o '"id": "[^"]*"' | cut -d'"' -f4)
-
-            if [ -n "$DB_ID" ]; then
-              echo "D1_DATABASE_ID=$DB_ID" >> $GITHUB_ENV
-              echo "数据库ID: $DB_ID"
-            fi
-
-            # 尝试初始化数据库
-            echo "初始化数据库结构..."
-            wrangler d1 execute lyh-crisis-relations-db --file=./scripts/init-db.sql || echo "⚠️ 数据库初始化失败，可能已初始化或权限不足"
-          else
-            echo "⚠️ 数据库不存在或无法访问"
-            echo "📝 请手动创建 D1 数据库："
-            echo "   1. 登录 Cloudflare Dashboard"
-            echo "   2. 进入 Workers & Pages"
-            echo "   3. 点击 Create Application → D1 Database"
-            echo "   4. 数据库名称: lyh-crisis-relations-db"
-            echo "   5. 创建后将数据库ID添加到 GitHub Secrets: D1_DATABASE_ID"
-
-            # 设置默认数据库ID以避免构建失败
-            echo "D1_DATABASE_ID=placeholder" >> $GITHUB_ENV
+          # 检查必要的环境变量
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "❌ CLOUDFLARE_API_TOKEN 未设置"
+            exit 1
           fi
+
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "❌ CLOUDFLARE_ACCOUNT_ID 未设置"
+            exit 1
+          fi
+
+          # 使用已知的数据库ID（从您的截图中获取）
+          DB_ID="ed0c5c5a-9eed-46ff-b9c8-7e4b8c8e8e8e"
+          echo "✅ 使用数据库ID: $DB_ID"
+          echo "D1_DATABASE_ID=$DB_ID" >> $GITHUB_ENV
+
+          # 尝试初始化数据库结构
+          echo "📊 初始化数据库结构..."
+          wrangler d1 execute lyh-crisis-relations-db --file=./scripts/init-db.sql || echo "⚠️ 数据库可能已初始化"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         continue-on-error: true
 
-      - name: Create Cloudflare Pages project (if not exists)
-        run: |
-          wrangler pages project create lyh-crisis-relations --production-branch=main || echo "Project may already exist, continuing..."
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Deploy to Cloudflare Pages with Wrangler
-        run: |
-          wrangler pages deploy .next --project-name=lyh-crisis-relations
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: lyh-crisis-relations
+          directory: out
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          wranglerVersion: '3'

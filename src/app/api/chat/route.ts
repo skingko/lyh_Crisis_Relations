@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
+// 静态导出配置
+export const dynamic = 'force-static'
+export const revalidate = false
+
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant'
   content: string

@@ -6,13 +6,12 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
-  // Cloudflare D1 configuration
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
