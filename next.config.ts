@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
   trailingSlash: true,
   distDir: '.next',
+  // 静态资源路径配置 - 使用相对路径以适配 Cloudflare Pages
+  basePath: '',
+  assetPrefix: '',
   images: {
     unoptimized: true
   },
