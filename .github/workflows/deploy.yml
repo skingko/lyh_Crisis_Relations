@@ -89,6 +89,28 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Deploy API Proxy Worker
+        run: |
+          echo "🔧 部署 API 代理 Worker..."
+          cd worker
+
+          # 安装 Worker 依赖
+          npm install
+
+          # 设置 API 密钥到 Worker Secrets
+          echo "🔑 设置 Worker Secrets..."
+          echo "${{ secrets.OPENAI_API_KEY }}" | npx wrangler secret put OPENAI_API_KEY --env production
+
+          # 部署 Worker
+          echo "🚀 部署 Worker 到生产环境..."
+          npx wrangler deploy --env production
+
+          echo "✅ Worker 部署完成"
+          cd ..
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy to Cloudflare Pages
         run: |
           echo "🚀 开始部署到 Cloudflare Pages..."
