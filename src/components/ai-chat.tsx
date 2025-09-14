@@ -50,7 +50,7 @@ export default function AIChat() {
 
     try {
       // 调用 Cloudflare Worker API 代理
-      const WORKER_API_URL = 'https://lyh-crisis-api-proxy.sking.cool'
+      const WORKER_API_URL = 'https://lyh-crisis-api-proxy-production.ssojoo.workers.dev'
 
       const response = await fetch(`${WORKER_API_URL}/api/chat`, {
         method: 'POST',
