@@ -33,6 +33,28 @@ try {
     throw new Error('Cloudflare Pages 构建失败：输出目录不存在');
   }
 
+  // 5. 复制 Cloudflare Pages Functions
+  console.log('📁 复制 Cloudflare Pages Functions...');
+  const functionsDir = path.join(process.cwd(), 'functions');
+  const outputFunctionsDir = path.join(process.cwd(), '.vercel/output/functions');
+
+  if (fs.existsSync(functionsDir)) {
+    // 确保输出目录存在
+    if (!fs.existsSync(outputFunctionsDir)) {
+      fs.mkdirSync(outputFunctionsDir, { recursive: true });
+    }
+
+    // 复制 functions 目录内容
+    execSync(`cp -r ${functionsDir}/* ${outputFunctionsDir}/`, { stdio: 'inherit' });
+    console.log('✅ Functions 复制完成');
+
+    // 列出复制的文件
+    console.log('📋 Functions 文件列表：');
+    execSync(`find ${outputFunctionsDir} -type f`, { stdio: 'inherit' });
+  } else {
+    console.log('⚠️ 未找到 functions 目录，跳过 Functions 复制');
+  }
+
   console.log('✅ 构建完成！输出目录：.vercel/output/static');
 
 } catch (error) {

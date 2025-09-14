@@ -92,7 +92,13 @@ jobs:
       - name: Deploy to Cloudflare Pages
         run: |
           echo "🚀 开始部署到 Cloudflare Pages..."
-          wrangler pages deploy .vercel/output/static --project-name=lyh-crisis-relations --compatibility-date=2024-09-23
+          echo "📁 部署目录内容："
+          ls -la .vercel/output/static/
+          echo "📁 Functions 目录内容："
+          ls -la functions/ || echo "No functions directory"
+
+          # 使用 wrangler pages deploy 部署静态文件和 Functions
+          wrangler pages deploy .vercel/output/static --project-name=lyh-crisis-relations --compatibility-date=2024-09-23 --compatibility-flags=nodejs_compat
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
