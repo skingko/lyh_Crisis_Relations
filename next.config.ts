@@ -14,14 +14,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.watchOptions = {
-        ignored: ['**/*'],
-      };
-    }
-    return config;
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -30,6 +22,10 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: false,
   },
+
+  // 压缩配置
+  compress: true,
+  poweredByHeader: false,
 
   // 环境变量配置
   env: {
