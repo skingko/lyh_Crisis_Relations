@@ -49,8 +49,10 @@ export default function AIChat() {
     setIsLoading(true)
 
     try {
-      // 尝试使用 Functions API 端点
-      let response = await fetch('/api/chat', {
+      // 调用 Cloudflare Worker API 代理
+      const WORKER_API_URL = 'https://lyh-crisis-api-proxy.sking.cool'
+
+      const response = await fetch(`${WORKER_API_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,50 +65,10 @@ export default function AIChat() {
         })
       })
 
-      // 如果 Functions API 不可用，尝试直接调用 Kimi API（可能会有 CORS 问题）
-      if (!response.ok && response.status === 404) {
-        console.log('Functions API 不可用，尝试直接调用 Kimi API...')
-        response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ***REMOVED***'
-          },
-          body: JSON.stringify({
-            model: 'kimi-k2-0905-preview',
-            messages: [
-              {
-                role: 'system',
-                content: `你是一位专业的舆论危机管理专家，专门分析和处理企业公关危机。当前正在分析罗永浩与西贝预制菜争议事件。
-
-**事件背景**：
-- 罗永浩质疑西贝使用预制菜并批评其价格
-- 西贝创始人贾国龙回应称门店没有预制菜并宣布起诉
-- 争议导致西贝营业额大幅下滑
-- 涉及预制菜定义、价格争议、透明度等核心问题
-
-**你的专业领域**：
-1. 危机公关策略制定
-2. 舆论分析和预判
-3. 品牌形象修复
-4. 媒体沟通策略
-5. 利益相关方管理
-
-请基于专业知识，为用户提供具体、可操作的建议。回答要专业、客观、有建设性。`
-              },
-              ...[...messages, userMessage].map(msg => ({
-                role: msg.role,
-                content: msg.content
-              }))
-            ],
-            temperature: 0.7,
-            max_tokens: 2000
-          })
-        })
-      }
-
       if (!response.ok) {
-        throw new Error(`API请求失败: ${response.status} - ${response.statusText}`)
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error('Worker API Error:', response.status, errorData)
+        throw new Error(`API请求失败: ${response.status} - ${errorData.error || 'Unknown error'}`)
       }
 
       const data = await response.json()
@@ -116,10 +78,12 @@ export default function AIChat() {
         // Kimi API 响应格式
         content = data.choices[0].message.content
       } else if (data.content) {
-        // Functions API 响应格式
+        // Worker API 响应格式
         content = data.content
       } else if (data.message) {
         content = data.message
+      } else if (data.error) {
+        throw new Error(data.error)
       } else {
         content = '抱歉，我暂时无法回答您的问题。'
       }
@@ -133,9 +97,27 @@ export default function AIChat() {
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
       console.error('发送消息失败:', error)
+
+      // 提供更友好的错误信息
+      let errorContent = '抱歉，AI服务暂时不可用。'
+
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          errorContent = '网络连接失败，请检查网络连接后重试。'
+        } else if (error.message.includes('403')) {
+          errorContent = '访问被拒绝，请确认您有权限访问此服务。'
+        } else if (error.message.includes('429')) {
+          errorContent = '请求过于频繁，请稍后再试。'
+        } else if (error.message.includes('500')) {
+          errorContent = 'AI服务暂时不可用，请稍后再试。'
+        } else {
+          errorContent = `服务异常：${error.message}`
+        }
+      }
+
       const errorMessage: ChatMessage = {
         role: 'assistant',
-        content: `抱歉，AI服务暂时不可用。错误信息：${error instanceof Error ? error.message : '未知错误'}。请稍后再试，或者查看页面上的事件时间线了解详细信息。`,
+        content: errorContent,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])

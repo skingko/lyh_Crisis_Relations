@@ -1,0 +1,18 @@
+name = "lyh-crisis-api-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# 允许的域名模式 - 支持泛域名
+ALLOWED_DOMAIN_PATTERNS = "*.sking.cool,*.taskin.chat,*.pages.dev"
+OPENAI_BASE_URL = "https://api.moonshot.cn/v1"
+OPENAI_MODEL = "kimi-k2-0905-preview"
+
+# 生产环境配置
+[env.production]
+vars = { ALLOWED_DOMAIN_PATTERNS = "*.sking.cool,*.taskin.chat" }
+
+# 预览环境配置
+[env.preview]
+vars = { ALLOWED_DOMAIN_PATTERNS = "*.sking.cool,*.taskin.chat,*.pages.dev" }

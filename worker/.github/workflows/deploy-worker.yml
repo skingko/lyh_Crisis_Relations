@@ -1,0 +1,61 @@
+name: Deploy API Proxy Worker
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'worker/**' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+        - preview
+        - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Worker
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: worker/package-lock.json
+
+      - name: Install dependencies
+        working-directory: worker
+        run: npm ci
+
+      - name: Deploy to Cloudflare Workers
+        working-directory: worker
+        run: |
+          # 设置环境变量到 wrangler
+          echo "Setting up environment variables..."
+
+          if [ "${{ github.event.inputs.environment }}" = "production" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "🚀 Deploying to production..."
+            npx wrangler secret put OPENAI_API_KEY --env production <<< "${{ secrets.OPENAI_API_KEY }}"
+            npx wrangler deploy --env production
+          else
+            echo "🚀 Deploying to preview..."
+            npx wrangler secret put OPENAI_API_KEY --env preview <<< "${{ secrets.OPENAI_API_KEY }}"
+            npx wrangler deploy --env preview
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Test deployment
+        run: |
+          echo "✅ Worker deployed successfully!"
+          echo "🔗 Production URL: https://lyh-crisis-api-proxy.your-subdomain.workers.dev"
+          echo "🔗 Preview URL: https://lyh-crisis-api-proxy.preview.your-subdomain.workers.dev"

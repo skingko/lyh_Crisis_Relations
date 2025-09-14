@@ -1,0 +1,28 @@
+{
+  "name": "lyh-crisis-api-proxy",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker API proxy for LYH Crisis Relations app",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "deploy:preview": "wrangler deploy --env preview",
+    "tail": "wrangler tail",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "api",
+    "proxy",
+    "crisis-management"
+  ],
+  "author": "Crisis Management Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240909.0",
+    "typescript": "^5.0.0",
+    "wrangler": "^3.78.0"
+  }
+}
