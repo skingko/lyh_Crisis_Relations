@@ -40,7 +40,7 @@ jobs:
 
       - name: Build application
         run: |
-          npm run build
+          echo "🏗️ 开始构建应用..."
           npm run build:pages
         env:
           NODE_ENV: production

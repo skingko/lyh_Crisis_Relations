@@ -3,9 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Cloudflare Pages 部署配置
   trailingSlash: true,
-  // 静态资源路径配置 - 使用相对路径以适配 Cloudflare Pages
-  basePath: '',
-  assetPrefix: '',
   images: {
     unoptimized: true
   },
@@ -27,6 +24,8 @@ const nextConfig: NextConfig = {
   // 压缩配置
   compress: true,
   poweredByHeader: false,
+
+
 
   // 环境变量配置
   env: {
