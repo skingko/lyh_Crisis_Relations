@@ -18,6 +18,7 @@
     "d1:migrate": "node scripts/migrate-d1.js",
     "d1:execute": "wrangler d1 execute lyh-crisis-relations-db",
     "d1:local": "wrangler d1 execute lyh-crisis-relations-db --local",
+    "d1:setup-manual": "./scripts/setup-d1-manual.sh",
     "deploy": "npm run build:static"
   },
   "dependencies": {

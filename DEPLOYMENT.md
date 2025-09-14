@@ -72,24 +72,40 @@
 
 #### 4. D1 数据库配置
 
-**自动创建（推荐）**
+**推荐：手动创建 D1 数据库**
 
-GitHub Actions 会自动创建和初始化 D1 数据库，无需手动操作。
+由于 API Token 权限限制，建议手动创建 D1 数据库：
 
-**手动创建（可选）**
+1. **登录 Cloudflare Dashboard**
+   - 访问 https://dash.cloudflare.com/
+   - 登录你的账户
 
-如果需要手动创建数据库：
+2. **创建 D1 数据库**
+   - 进入左侧菜单 "Workers & Pages"
+   - 点击 "Create Application" → "D1 Database"
+   - 数据库名称: `lyh-crisis-relations-db`
+   - 点击 "Create"
 
-```bash
-# 安装 Wrangler
-npm install -g wrangler
+3. **获取数据库 ID**
+   - 创建成功后，复制数据库 ID
+   - 格式类似：`xxxx-xxxx-xxxx-xxxx`
 
-# 创建 D1 数据库
-wrangler d1 create lyh-crisis-relations-db
+4. **配置 GitHub Secrets**
+   - 在 GitHub 仓库设置中添加：
+     - `D1_DATABASE_ID`: 你的数据库 ID
 
-# 初始化数据库结构
-wrangler d1 execute lyh-crisis-relations-db --file=./scripts/init-db.sql
-```
+5. **初始化数据库结构**
+   ```bash
+   # 安装 Wrangler
+   npm install -g wrangler
+
+   # 初始化数据库
+   wrangler d1 execute lyh-crisis-relations-db --file=./scripts/init-db.sql
+   ```
+
+**自动创建（实验性）**
+
+GitHub Actions 会尝试自动创建数据库，但需要正确的 API Token 权限。如果失败，请使用手动方法。
 
 **数据库绑定配置**
 

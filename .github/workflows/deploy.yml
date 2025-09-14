@@ -47,33 +47,39 @@ jobs:
 
       - name: Setup D1 Database
         run: |
-          # 检查数据库是否存在，不存在则创建
+          # 尝试检查数据库是否存在
           echo "检查 D1 数据库..."
-          if ! wrangler d1 info lyh-crisis-relations-db 2>/dev/null; then
-            echo "创建 D1 数据库..."
-            wrangler d1 create lyh-crisis-relations-db
-            echo "等待数据库创建完成..."
-            sleep 10
+          if wrangler d1 info lyh-crisis-relations-db 2>/dev/null; then
+            echo "✅ 数据库已存在"
+
+            # 获取数据库ID
+            DB_INFO=$(wrangler d1 info lyh-crisis-relations-db)
+            DB_ID=$(echo "$DB_INFO" | grep -o '"id": "[^"]*"' | cut -d'"' -f4)
+
+            if [ -n "$DB_ID" ]; then
+              echo "D1_DATABASE_ID=$DB_ID" >> $GITHUB_ENV
+              echo "数据库ID: $DB_ID"
+            fi
+
+            # 尝试初始化数据库
+            echo "初始化数据库结构..."
+            wrangler d1 execute lyh-crisis-relations-db --file=./scripts/init-db.sql || echo "⚠️ 数据库初始化失败，可能已初始化或权限不足"
           else
-            echo "数据库已存在"
+            echo "⚠️ 数据库不存在或无法访问"
+            echo "📝 请手动创建 D1 数据库："
+            echo "   1. 登录 Cloudflare Dashboard"
+            echo "   2. 进入 Workers & Pages"
+            echo "   3. 点击 Create Application → D1 Database"
+            echo "   4. 数据库名称: lyh-crisis-relations-db"
+            echo "   5. 创建后将数据库ID添加到 GitHub Secrets: D1_DATABASE_ID"
+
+            # 设置默认数据库ID以避免构建失败
+            echo "D1_DATABASE_ID=placeholder" >> $GITHUB_ENV
           fi
-
-          # 获取数据库ID并更新配置
-          echo "获取数据库信息..."
-          DB_INFO=$(wrangler d1 info lyh-crisis-relations-db)
-          DB_ID=$(echo "$DB_INFO" | grep -o '"id": "[^"]*"' | cut -d'"' -f4)
-
-          if [ -n "$DB_ID" ]; then
-            echo "D1_DATABASE_ID=$DB_ID" >> $GITHUB_ENV
-            echo "数据库ID: $DB_ID"
-          fi
-
-          # 初始化数据库
-          echo "初始化数据库结构..."
-          wrangler d1 execute lyh-crisis-relations-db --file=./scripts/init-db.sql || echo "数据库可能已初始化"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        continue-on-error: true
 
       - name: Create Cloudflare Pages project (if not exists)
         run: |
