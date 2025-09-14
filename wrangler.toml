@@ -1,0 +1,48 @@
+name = "lyh-crisis-relations"
+compatibility_date = "2024-09-14"
+
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "modules"
+dir = ".next"
+
+[env.production]
+vars = { NODE_ENV = "production" }
+
+[env.preview]
+vars = { NODE_ENV = "development" }
+
+# Environment variables configuration
+[env.production.vars]
+OPENAI_API_KEY = ""
+OPENAI_BASE_URL = "https://api.moonshot.cn/v1"
+OPENAI_MODEL = "kimi-k2-0905-preview"
+
+[env.preview.vars]
+OPENAI_API_KEY = ""
+OPENAI_BASE_URL = "https://api.moonshot.cn/v1"
+OPENAI_MODEL = "kimi-k2-0905-preview"
+
+# Page configuration
+[[pages]]
+project = "lyh-crisis-relations"
+production_branch = "main"
+
+# Headers configuration
+[[headers]]
+for = "/*"
+[headers.values]
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"
+X-XSS-Protection = "1; mode=block"
+Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache configuration
+[[headers]]
+for = "/api/*"
+[headers.values]
+Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
+Pragma = "no-cache"
+Expires = "0"
